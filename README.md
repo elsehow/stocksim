@@ -1,13 +1,13 @@
 # stocksim
 
-A Clojure stock simulation to illustrate examples in a blog post.
+stock simulation in Clojure 
 
 ## Usage
 
-Use LightTable, open core.clj and eval the examples.
+Run with CIDER in emacs
 
 ## License
 
-Copyright © 2013 Timothy Pratley
+adapted from work by Timothy Pratley
 
-Distributed under the Eclipse Public License, the same as Clojure.
+Eclipse Public License, like Clojure.
