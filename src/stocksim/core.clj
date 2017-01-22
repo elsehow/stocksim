@@ -157,3 +157,77 @@
 (buy-and-hold #(fixed-step 0.054 %))
 (buy-and-hold #(fixed-step 0.037 %))
 
+
+(defn compound3 [amount yearly-contribs yields]
+  (let [history (if (vector? amount) amount [ amount ])
+        this-yield (first yields)
+        this-years-returns (* (last history) this-yield)
+        next-years-balance (+ this-years-returns
+                              (first yearly-contribs)
+                              (last history))
+        ]
+    (if (= 1 (count yields)) amount
+        (recur (conj history next-years-balance)
+               (rest yearly-contribs)
+               (rest yields)
+               )
+        )
+    ))
+
+
+(defn contribs [n caps increase]
+  (if (zero? n)
+    caps
+    (recur
+     (dec n)
+     (conj caps
+           (+ (last caps)
+              (* increase (last caps))
+              ))
+     increase
+
+      )
+  )
+  )
+
+(contribs 10 [31200] 0.05)
+
+(compound3 80000
+           (contribs 10 [31200] 0.05)
+           (repeat 10 0.05)
+           )
+
+(defn random-normal
+  "Simulate a normal distribution by adding random numbers together"
+  []
+  (reduce + -50 (repeatedly 100 rand)))
+
+(random-normal)
+
+(defn normal-step
+  "Add a (biased) random normal number relative to current price"
+  [price]
+  (let [biased (+ price (random-normal))
+        scale 0.004]
+    (+ price (* biased scale))))
+
+
+
+(defn generate-yields [n start]
+  (take n (iterate normal-step start))
+  )
+
+(let [simulations
+      (repeatedly 1000
+                  #(last
+                    (compound3 80000
+                               (contribs 10 [31200] 0.07)
+                               (generate-yields 10 0.05))))
+      ]
+
+  (view (histogram simulations
+                   :title "Simulated outcomes after ten years"))
+
+   (median simulations)
+
+  )
